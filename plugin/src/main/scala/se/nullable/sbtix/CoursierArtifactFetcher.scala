@@ -45,6 +45,15 @@ case class GenericModule(primaryArtifact: Artifact,
   }
 
   /**
+    * remote location of the module and all related artifacts without the in URL auth
+    */
+  private val calculatedParentURIWithoutAuth = if (isIvy) {
+    parentURI(parentURI(url.toURI))
+  } else {
+    parentURI(url.toURI)
+  }
+
+  /**
     * create the authenticated version of a given url
     */
   def authed(url: URL) = {
@@ -70,6 +79,17 @@ case class GenericModule(primaryArtifact: Artifact,
         f.getParentFile().getName() + "/" + f.getName())
     } else {
       calculatedParentURI.resolve(f.getName())
+    }
+
+  /**
+    * resolve the URI of a sibling artifact, based on the primary artifact's parent URI
+    */
+  def calculateURIWithoutAuth(f: File) =
+    if (isIvy) {
+      calculatedParentURIWithoutAuth.resolve(
+        f.getParentFile().getName() + "/" + f.getName())
+    } else {
+      calculatedParentURIWithoutAuth.resolve(f.getName())
     }
 
   /**

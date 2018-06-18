@@ -65,14 +65,15 @@ class FindArtifactsOfRepo(repoName: String, root: String) {
             .isDefined) //filter for interesting files
 
       targetArtifacts.map { artifactLocalFile =>
-        val calcUrl = ga.calculateURI(artifactLocalFile).toURL
+        val calcUrl = ga.calculateURI(artifactLocalFile).toURL.toString
+        val calcUrlWithoutAuth = ga.calculateURIWithoutAuth(artifactLocalFile).toURL.toString
 
         NixArtifact(
           repoName,
-          calcUrl.toString.replace(authedRootURI.toString, "").stripPrefix("/"),
-          calcUrl.toString,
+          calcUrl.replace(authedRootURI.toString, "").stripPrefix("/"),
+          calcUrlWithoutAuth,
           FindArtifactsOfRepo
-            .fetchChecksum(calcUrl.toString,
+            .fetchChecksum(calcUrl,
                            "Artifact",
                            artifactLocalFile.toURI.toURL)
             .get
