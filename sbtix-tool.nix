@@ -53,12 +53,6 @@ let
       echo "$SBTIX_PLUGIN_FILE is not a symlink, keeping it intact"
     fi
 
-    if [ "$SBT_OPTS" != "" ]; then
-      echo '$SBT_OPTS is set, unsetting'
-      unset -v SBT_OPTS
-    fi
-
-
     #the sbt.global.base directory must be writable
     ${sbt}/bin/sbt -Dsbt.global.base=$SBTIX_GLBASE_DIR "$@"
   '';

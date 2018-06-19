@@ -73,10 +73,11 @@ case class NixRepo(name: String, pattern: Option[String]) extends NixBuilder {
 case class NixArtifactCollection(artifacts: Seq[NixArtifact])
     extends NixBuilder {
   val toNixRef = quote("artifacts")
+  val values = artifacts.map((a) => (a.relative, a)).toMap.values.map(_.toNix)
 
   def toNixValue: String =
     s"""{
-        |  ${indent(artifacts.distinct.map(_.toNix).mkString("\r\n"))}
+        |  ${indent(values.mkString("\r\n"))}
         |}""".stripMargin
 
 }
@@ -88,9 +89,10 @@ case class NixArtifact(repoName: String,
     extends NixBuilder {
   val toNixRef = s"${quote(repoName + "/" + relative)}"
 
-  def toNixValue =
+  def toNixValue = {
     s"""{
-        |  url = ${quote(url)};
-        |  sha256 = ${quote(sha256)};
-        |}""".stripMargin
+       |  url = ${quote(url)};
+       |  sha256 = ${quote(sha256)};
+       |}""".stripMargin
+  }
 }
