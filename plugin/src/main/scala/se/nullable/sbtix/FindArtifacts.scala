@@ -67,7 +67,7 @@ class FindArtifactsOfRepo(repoName: String, root: String) {
       targetArtifacts.map { artifactLocalFile =>
         val calcUrl = ga.calculateURI(artifactLocalFile).toURL.toString
         val calcUrlWithoutAuth = ga.calculateURIWithoutAuth(artifactLocalFile).toURL.toString
-
+        println(s"url without auth: $calcUrlWithoutAuth")
         NixArtifact(
           repoName,
           calcUrl.replace(authedRootURI.toString, "").stripPrefix("/"),
