@@ -27,7 +27,7 @@ object NixPlugin extends AutoPlugin {
         .filterNot {
           _.module.organization == "se.nullable.sbtix"
         } //ignore the sbtix dependency that gets added because of the global sbtix plugin
-
+      println(s"Credentials: ${CoursierPlugin.autoImport.coursierCredentials.value.toSet}")
       GenProjectData(scalaVersion.value,
                      sbtVersion.value,
                      depends,
