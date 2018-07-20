@@ -129,7 +129,7 @@ in rec {
             dontStrip         = true;
 
             # COURSIER_CACHE env variable is needed if one wants to use non-sbtix repositories in the below repo list, which is sometimes useful.
-            COURSIER_CACHE = "./.coursier/cache/v1";
+            # COURSIER_CACHE = "./.coursier/cache/v1";
 
             # configurePhase = ''
             #   cp -Lr ${sbtSetupTemplate}/ivy ./.ivy2
