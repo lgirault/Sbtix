@@ -6,10 +6,9 @@ import java.net.{URI, URL}
 import sbt.ProjectRef
 import coursier._
 import coursier.core.Authentication
-import sbt.{Logger, ModuleID, Resolver, PatternsBasedRepository}
-
+import sbt.{Logger, ModuleID, PatternsBasedRepository, Resolver}
 import scalaz.concurrent.Task
-import scalaz.{-\/, EitherT, \/-}
+import scalaz.{-\/, \/-}
 import java.util.concurrent.ConcurrentSkipListSet
 
 import scala.collection.JavaConverters._
@@ -19,6 +18,8 @@ import scala.concurrent.duration.Duration
 import scala.util.control.NonFatal
 import java.nio.file.{StandardCopyOption, Files => NioFiles}
 
+import coursier.core.Resolution.ModuleVersion
+import coursier.util.{EitherT, Schedulable}
 import matryoshka.Coalgebra
 import matryoshka._
 import matryoshka.data._
@@ -100,6 +101,25 @@ case class MetaArtifact(artifactUrl: String, checkSum: String)
     artifactUrl.contains(mvn) || artifactUrl.contains(ivy)
   }
 }
+
+object CoursierArtifactFetcher {
+
+  implicit val schedulable: Schedulable[Task] =
+    new TaskGather with Schedulable[Task] {
+      override def schedule[A](pool: ExecutorService)(f: => A): Task[A] =
+        Task(f)(pool)
+    }
+
+//    import scala.concurrent.ExecutionContext.Implicits.global
+//
+//    implicit class TaskOps[T](val task: Task[T]) extends AnyVal {
+//      def unsafePerformSync: T = Await.result(task.value(global), 5 seconds)
+//    }
+//
+//
+
+}
+import CoursierArtifactFetcher._
 
 class CoursierArtifactFetcher(logger: Logger,
                               resolvers: Set[Resolver],
@@ -229,7 +249,7 @@ class CoursierArtifactFetcher(logger: Logger,
             metaArtifactCollector.add(MetaArtifact(artifact.url, checkSum))
           }
         }
-        EitherT.fromEither(Task.now[Either[String, String]](res))
+        EitherT.fromEither(res)
       }
   }
 
@@ -384,7 +404,7 @@ class CoursierArtifactFetcher(logger: Logger,
     Map("ivy.home" -> new File(sys.props("user.home"), ".ivy2").toString) ++ sys.props
 }
 
-case class ResolutionErrors(errors: Seq[(Dependency, Seq[String])]) {
+case class ResolutionErrors(errors: Seq[(ModuleVersion, Seq[String])]) {
 
   def +(other: ResolutionErrors) = {
     ResolutionErrors(errors ++ other.errors)

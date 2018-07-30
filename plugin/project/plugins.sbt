@@ -1,6 +1,6 @@
 libraryDependencies += "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.3")
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.1.0-M6")
 
 addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.15")
 
